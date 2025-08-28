@@ -3,17 +3,20 @@ import math
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import binom, norm
+from matplotlib import font_manager
 
 # ------------------------------
-# matplotlib 日本語対応（Streamlit Cloud向け）
+# 日本語フォントの設定（Streamlit Cloud向け）
 # ------------------------------
-plt.rcParams["font.family"] = "DejaVu Sans"
+font_path = "/path/to/your/font.ttf"  # フォントファイルのパスを指定
+noto_font = font_manager.FontProperties(fname=font_path)
+plt.rcParams["font.family"] = noto_font.get_name()
 plt.rcParams["axes.unicode_minus"] = False
 
 # ------------------------------
 # タイトル
 # ------------------------------
-st.title("確率分布シミュレーター ver1.002")
+st.title("確率分布シミュレーター ver1.003")
 
 # ------------------------------
 # 入力欄
@@ -119,4 +122,3 @@ st.pyplot(fig)
 # ------------------------------
 st.markdown("---")
 st.markdown("作成者: Sigma")
-
