@@ -3,17 +3,23 @@ import math
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import binom, norm
+from matplotlib import font_manager
 
 # ------------------------------
-# matplotlib 日本語対応
+# バージョン
 # ------------------------------
-plt.rcParams["font.family"] = "Yu Gothic"
-plt.rcParams["axes.unicode_minus"] = False
+APP_VERSION = "ver1.013"
 
 # ------------------------------
-# タイトル（バージョン管理）
+# フォント設定（日本語対応）
 # ------------------------------
-st.title("確率分布シミュレーター ver1.000")
+font_path = "NotoSansJP-Black.ttf"  # リポジトリに配置
+jp_font = font_manager.FontProperties(fname=font_path)
+
+# ------------------------------
+# タイトル
+# ------------------------------
+st.title(f"確率分布シミュレーター {APP_VERSION}")
 
 # ------------------------------
 # 入力欄（デフォルト値）
@@ -113,12 +119,10 @@ ax.plot(x_vals, y_vals, color="blue", linewidth=2, label="正規分布近似")
 
 # 小さい方だけを塗る（表示に合わせる）
 if small_label == "下位":
-    # 下側を赤で塗る（x <= k）
     x_fill = np.linspace(x_min, min(k, x_max), 500)
     y_fill = norm.pdf(x_fill, mu, sigma)
     ax.fill_between(x_fill, y_fill, color="salmon", alpha=0.6)
 else:
-    # 上側を水色で塗る（x >= k）
     x_fill = np.linspace(max(k, x_min), x_max, 500)
     y_fill = norm.pdf(x_fill, mu, sigma)
     ax.fill_between(x_fill, y_fill, color="skyblue", alpha=0.6)
@@ -126,13 +130,13 @@ else:
 # 当たり回数の縦線（緑）
 ax.axvline(k, color="green", linestyle="--", linewidth=2, label=f"当たり回数={k}")
 
-# ラベル・スタイル
-ax.set_xlabel("当たり回数", fontweight="bold")
-ax.set_ylabel("確率", fontweight="bold")
-ax.set_title("正規分布近似", fontweight="bold")
+# ラベル・スタイル（日本語フォントはここに適用）
+ax.set_xlabel("当たり回数", fontproperties=jp_font)
+ax.set_ylabel("確率", fontproperties=jp_font)
+ax.set_title("正規分布近似", fontproperties=jp_font)
 ax.set_xlim(left=0)
 ax.set_ylim(bottom=0)
-ax.legend()
+ax.legend(prop=jp_font)
 ax.grid(True, linestyle="--", alpha=0.5)
 
 st.pyplot(fig)
