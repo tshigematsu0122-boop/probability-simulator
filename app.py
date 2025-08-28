@@ -24,18 +24,18 @@ st.title(f"確率分布シミュレーター {APP_VERSION}")
 # ------------------------------
 # 入力欄
 # ------------------------------
-n1_str = st.text_input("確率分母", "10")
+n1_str = st.text_input("確率分母", "319.7")
 try:
     n1 = float(n1_str)
     if n1 <= 0:
         st.warning("確率分母は0より大きい値を入力してください")
-        n1 = 10.0
+        n1 = 319.7
 except ValueError:
     st.warning("有効な数字を入力してください")
-    n1 = 10.0
+    n1 = 319.7
 
-n2 = st.number_input("回転数（ゲーム数）", min_value=1, value=100, step=1)
-n3 = st.number_input("当たり回数", min_value=0, value=20, step=1)
+n2 = st.number_input("回転数（ゲーム数）", min_value=1, value=320, step=1)
+n3 = st.number_input("当たり回数", min_value=0, value=1, step=1)
 
 # ------------------------------
 # 計算
@@ -130,3 +130,4 @@ st.pyplot(fig)
 # ------------------------------
 st.markdown("---")
 st.markdown("作成者: Sigma")
+
