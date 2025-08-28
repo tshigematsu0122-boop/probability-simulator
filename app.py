@@ -3,20 +3,24 @@ import math
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import binom, norm
+from matplotlib import font_manager
 
 # ------------------------------
-# matplotlib 日本語対応
+# Google Noto Sans JP フォント設定
 # ------------------------------
-plt.rcParams["font.family"] = "Yu Gothic"
+# Streamlit Cloud でも日本語を表示可能にする
+font_path = "https://github.com/googlefonts/noto-cjk/raw/main/Sans/OTF/Japanese/NotoSansJP-Regular.otf"
+noto_font = font_manager.FontProperties(fname=font_path)
+plt.rcParams["font.family"] = noto_font.get_name()
 plt.rcParams["axes.unicode_minus"] = False
 
 # ------------------------------
-# タイトル（バージョン管理）
+# タイトル
 # ------------------------------
-st.title("確率分布シミュレーター ver1.000")
+st.title("確率分布シミュレーター ver1.001")
 
 # ------------------------------
-# 入力欄（デフォルト値）
+# 入力欄
 # ------------------------------
 n1_str = st.text_input("確率分母", "319.7")
 try:
@@ -31,110 +35,87 @@ except ValueError:
 n2 = st.number_input("回転数（ゲーム数）", min_value=1, value=320, step=1)
 n3 = st.number_input("当たり回数", min_value=0, value=1, step=1)
 
-# 整数化
-n = int(n2)
-k = int(n3)
-
 # ------------------------------
-# 確率計算
+# 計算
 # ------------------------------
-p = 1.0 / n1
+p = 1 / n1
+n = n2
+k = n3
 
-# 二項分布で「ちょうど k 回」の確率
+# 二項分布確率
 prob_exact = binom.pmf(k, n, p)
 
-# P(X < k) = P(X <= k-1)
-if k > 0:
-    cdf_below_k = binom.cdf(k - 1, n, p)
-else:
-    cdf_below_k = 0.0
+# 下側累積確率
+cdf_lower = binom.cdf(k, n, p)
+# 上側累積確率
+cdf_upper = binom.sf(k-1, n, p)
 
-# 上側: P(X >= k) = 1 - P(X <= k-1)
-cdf_ge_k = 1.0 - cdf_below_k
+# 小さい方の累積確率
+cum_prob = min(cdf_lower, cdf_upper)
 
-# 上位 / 下位（合計 ≒ 100%）
-upper_percent = 100.0 * cdf_ge_k
-lower_percent = 100.0 * cdf_below_k
+# 上位/下位％表示（小さい方だけ）
+percent = 100 * cum_prob
+position_text = f"この事象は上位 {percent:.2f}% に位置します。"
 
-# 小さい方（表示・頻度計算に使う）
-if upper_percent < lower_percent:
-    small_label = "上位"
-    small_percent = upper_percent
-else:
-    small_label = "下位"
-    small_percent = lower_percent
+# 「この事象は◯回に1回」の計算（小さい方）
+freq = 1 / cum_prob if cum_prob > 0 else float('inf')
+freq_text = f"この事象はおよそ {freq:.2f} 回に1回の確率です。"
 
-# 「この事象は◯回に1回」の計算（小さい方の逆数、制限なし）
-if small_percent > 0:
-    one_in_x = 100.0 / small_percent
-else:
-    one_in_x = float("inf")
-
-# ------------------------------
-# 表示用の文字列（理論値/実践値）
-# ------------------------------
-def fmt_trim(x: float) -> str:
-    return f"{x:.2f}".rstrip("0").rstrip(".")
-
-theoretical_str = f"1/{fmt_trim(n1)}"
-if k == 0:
-    practical_str = "0"
-else:
-    practical_str = f"1/{fmt_trim(n / k)}"  # 実践値は 1/(n/k)
-
-# ------------------------------
-# 結果表示
-# ------------------------------
-st.subheader("計算結果")
-st.write(f"理論値　　{theoretical_str}　　　実践値　　{practical_str}")
-st.write(f"二項分布による確率: {prob_exact * 100:.4f}%")
-st.write(f"この事象は上位 {upper_percent:.2f}%、下位 {lower_percent:.2f}% に位置します。")
-if math.isfinite(one_in_x):
-    st.write(f"この事象はおよそ {one_in_x:.2f} 回に1回の確率です。")
-else:
-    st.write("この事象はほぼ起こりません。")
-
-# ------------------------------
-# 正規近似（グラフ用）
-# ------------------------------
+# 正規分布近似
 mu = n * p
 sigma = math.sqrt(n * p * (1 - p))
 
+# ------------------------------
+# 計算結果表示（理論値／実践値追加）
+# ------------------------------
+st.subheader("計算結果")
+
+# 理論値
+theoretical_str = f"1/{n1:.2f}".rstrip('0').rstrip('.')
+
+# 実践値
+if k == 0:
+    practical_str = "0"
+else:
+    practical_str = f"1/{(n/k):.2f}".rstrip('0').rstrip('.')
+
+st.write(f"理論値　　{theoretical_str}　　　実践値　　{practical_str}")
+st.write(f"二項分布による確率: {prob_exact*100:.4f}%")
+st.write(position_text)
+st.write(freq_text)
+
+# ------------------------------
+# グラフ描画（色付き、濃く、ラベル太字）
+# ------------------------------
 st.subheader("正規分布近似グラフ")
 
-# 描画範囲
-x_min = max(0, mu - 4 * sigma)
-x_max = mu + 4 * sigma
-x_vals = np.linspace(x_min, x_max, 500)
-y_vals = norm.pdf(x_vals, mu, sigma)
+x_min = max(0, mu - 4*sigma)
+x_max = mu + 4*sigma
+x = np.linspace(x_min, x_max, 500)
+y = norm.pdf(x, mu, sigma)
 
-fig, ax = plt.subplots(figsize=(8, 5))
-ax.plot(x_vals, y_vals, color="blue", linewidth=2, label="正規分布近似")
+fig, ax = plt.subplots(figsize=(8,5))
+ax.plot(x, y, color='blue', linewidth=2, label="正規分布近似")
 
-# 小さい方だけを塗る（表示に合わせる）
-if small_label == "下位":
-    # 下側を赤で塗る（x <= k）
-    x_fill = np.linspace(x_min, min(k, x_max), 500)
+# 塗りつぶし判定（小さい方が50%以下なら塗る）
+if cum_prob <= 0.5:
+    x_fill = np.linspace(x_min, k, 500)
     y_fill = norm.pdf(x_fill, mu, sigma)
-    ax.fill_between(x_fill, y_fill, color="salmon", alpha=0.6)
-else:
-    # 上側を水色で塗る（x >= k）
-    x_fill = np.linspace(max(k, x_min), x_max, 500)
-    y_fill = norm.pdf(x_fill, mu, sigma)
-    ax.fill_between(x_fill, y_fill, color="skyblue", alpha=0.6)
+    ax.fill_between(x_fill, y_fill, color='salmon', alpha=0.6)
 
 # 当たり回数の縦線（緑）
-ax.axvline(k, color="green", linestyle="--", linewidth=2, label=f"当たり回数={k}")
+ax.axvline(k, color='green', linestyle='--', linewidth=2, label=f"当たり回数={k}")
 
-# ラベル・スタイル
-ax.set_xlabel("当たり回数", fontweight="bold")
-ax.set_ylabel("確率", fontweight="bold")
-ax.set_title("正規分布近似", fontweight="bold")
-ax.set_xlim(left=0)
+# ラベル・タイトルを太字
+ax.set_xlabel("当たり回数", fontweight='bold')
+ax.set_ylabel("確率", fontweight='bold')
+ax.set_title("正規分布近似", fontweight='bold')
+
+# 縦横ゼロ固定
 ax.set_ylim(bottom=0)
+ax.set_xlim(left=0)
 ax.legend()
-ax.grid(True, linestyle="--", alpha=0.5)
-
+ax.grid(True, linestyle='--', alpha=0.5)
 st.pyplot(fig)
 
 # ------------------------------
@@ -142,3 +123,4 @@ st.pyplot(fig)
 # ------------------------------
 st.markdown("---")
 st.markdown("作成者: Sigma")
+
