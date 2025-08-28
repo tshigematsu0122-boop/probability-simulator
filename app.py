@@ -13,24 +13,23 @@ plt.rcParams["axes.unicode_minus"] = False
 # ------------------------------
 # タイトル
 # ------------------------------
-st.title("確率分布シミュレーター ver1.008")
+st.title("確率分布シミュレーター ver1.007")
 
 # ------------------------------
 # 入力欄
 # ------------------------------
-# デフォルト値のみ更新
-n1_str = st.text_input("確率分母", "319.7")
+n1_str = st.text_input("確率分母", "10")
 try:
     n1 = float(n1_str)
     if n1 <= 0:
         st.warning("確率分母は0より大きい値を入力してください")
-        n1 = 319.7
+        n1 = 10.0
 except ValueError:
     st.warning("有効な数字を入力してください")
-    n1 = 319.7
+    n1 = 10.0
 
-n2 = st.number_input("回転数（ゲーム数）", min_value=1, value=320, step=1)
-n3 = st.number_input("当たり回数", min_value=0, value=1, step=1)
+n2 = st.number_input("回転数（ゲーム数）", min_value=1, value=100, step=1)
+n3 = st.number_input("当たり回数", min_value=0, value=20, step=1)
 
 # ------------------------------
 # 計算
