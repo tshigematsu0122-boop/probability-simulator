@@ -8,7 +8,7 @@ from matplotlib import font_manager
 # ------------------------------
 # バージョン
 # ------------------------------
-APP_VERSION = "ver1.007"
+APP_VERSION = "ver1.010"
 
 # ------------------------------
 # フォント設定（日本語対応）
@@ -55,9 +55,10 @@ cdf_upper = binom.sf(k-1, n, p)
 # 小さい方の累積確率
 cum_prob = min(cdf_lower, cdf_upper)
 
-# 上位/下位％表示（小さい方のみ）
-percent = 100 * cum_prob
-position_text = f"この事象は上位 {percent:.2f}% に位置します。"
+# 上位/下位％表示（両方）
+upper_percent = 100 * cdf_upper
+lower_percent = 100 * cdf_lower
+position_text = f"この事象は上位 {upper_percent:.2f}%、下位 {lower_percent:.2f}% に位置します。"
 
 # 「この事象は◯回に1回」の計算（小さい方）
 freq = 1 / cum_prob if cum_prob > 0 else float('inf')
@@ -87,7 +88,7 @@ st.write(position_text)
 st.write(freq_text)
 
 # ------------------------------
-# グラフ描画（ver1.000のまま、文字化け防止のみ）
+# グラフ描画（文字化け防止済み、ver1.000スタイル）
 # ------------------------------
 st.subheader("正規分布近似グラフ")
 
@@ -130,4 +131,3 @@ st.pyplot(fig)
 # ------------------------------
 st.markdown("---")
 st.markdown("作成者: Sigma")
-
