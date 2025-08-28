@@ -8,7 +8,7 @@ from matplotlib import font_manager
 # ------------------------------
 # バージョン
 # ------------------------------
-APP_VERSION = "ver1.010"
+APP_VERSION = "ver1.011"
 
 # ------------------------------
 # フォント設定（日本語対応）
@@ -22,7 +22,7 @@ jp_font = font_manager.FontProperties(fname=font_path)
 st.title(f"確率分布シミュレーター {APP_VERSION}")
 
 # ------------------------------
-# 入力欄
+# 入力欄（デフォルト値指定）
 # ------------------------------
 n1_str = st.text_input("確率分母", "319.7")
 try:
@@ -55,9 +55,9 @@ cdf_upper = binom.sf(k-1, n, p)
 # 小さい方の累積確率
 cum_prob = min(cdf_lower, cdf_upper)
 
-# 上位/下位％表示（両方）
-upper_percent = 100 * cdf_upper
-lower_percent = 100 * cdf_lower
+# 上位/下位％表示（合計100％）
+lower_percent = 100 * cum_prob
+upper_percent = 100 - lower_percent
 position_text = f"この事象は上位 {upper_percent:.2f}%、下位 {lower_percent:.2f}% に位置します。"
 
 # 「この事象は◯回に1回」の計算（小さい方）
@@ -88,7 +88,7 @@ st.write(position_text)
 st.write(freq_text)
 
 # ------------------------------
-# グラフ描画（文字化け防止済み、ver1.000スタイル）
+# グラフ描画（ver1.000のまま、文字化け防止のみ）
 # ------------------------------
 st.subheader("正規分布近似グラフ")
 
