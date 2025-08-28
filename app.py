@@ -8,12 +8,12 @@ from matplotlib import font_manager
 # ------------------------------
 # バージョン
 # ------------------------------
-APP_VERSION = "ver1.006"
+APP_VERSION = "ver1.007"
 
 # ------------------------------
 # フォント設定（日本語対応）
 # ------------------------------
-font_path = "NotoSansJP-Black.ttf"  # ttfファイルをリポジトリ直下に置く
+font_path = "NotoSansJP-Black.ttf"  # リポジトリに配置
 jp_font = font_manager.FontProperties(fname=font_path)
 
 # ------------------------------
@@ -47,8 +47,9 @@ k = n3
 # 二項分布確率
 prob_exact = binom.pmf(k, n, p)
 
-# 累積確率
+# 下側累積確率
 cdf_lower = binom.cdf(k, n, p)
+# 上側累積確率
 cdf_upper = binom.sf(k-1, n, p)
 
 # 小さい方の累積確率
@@ -86,7 +87,7 @@ st.write(position_text)
 st.write(freq_text)
 
 # ------------------------------
-# グラフ描画（色付き、文字化け防止）
+# グラフ描画（ver1.000のまま、文字化け防止のみ）
 # ------------------------------
 st.subheader("正規分布近似グラフ")
 
