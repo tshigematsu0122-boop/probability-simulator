@@ -3,17 +3,23 @@ import math
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import binom, norm
+from matplotlib import font_manager
 
 # ------------------------------
-# matplotlib 日本語対応
+# バージョン
 # ------------------------------
-plt.rcParams["font.family"] = "Yu Gothic"
-plt.rcParams["axes.unicode_minus"] = False
+APP_VERSION = "ver1.007"
+
+# ------------------------------
+# フォント設定（日本語対応）
+# ------------------------------
+font_path = "NotoSansJP-Black.ttf"  # リポジトリに配置
+jp_font = font_manager.FontProperties(fname=font_path)
 
 # ------------------------------
 # タイトル
 # ------------------------------
-st.title("確率分布シミュレーター ver1.007")
+st.title(f"確率分布シミュレーター {APP_VERSION}")
 
 # ------------------------------
 # 入力欄
@@ -49,10 +55,9 @@ cdf_upper = binom.sf(k-1, n, p)
 # 小さい方の累積確率
 cum_prob = min(cdf_lower, cdf_upper)
 
-# 上位/下位％表示（小さい方のみ反映）
-upper_percent = 100 * cum_prob
-lower_percent = 100 * (1 - cum_prob)
-position_text = f"この事象は上位 {upper_percent:.2f}%、下位 {lower_percent:.2f}% に位置します。"
+# 上位/下位％表示（小さい方のみ）
+percent = 100 * cum_prob
+position_text = f"この事象は上位 {percent:.2f}% に位置します。"
 
 # 「この事象は◯回に1回」の計算（小さい方）
 freq = 1 / cum_prob if cum_prob > 0 else float('inf')
@@ -63,7 +68,7 @@ mu = n * p
 sigma = math.sqrt(n * p * (1 - p))
 
 # ------------------------------
-# 計算結果表示（理論値／実践値）
+# 計算結果表示（理論値／実践値追加）
 # ------------------------------
 st.subheader("計算結果")
 
@@ -82,7 +87,7 @@ st.write(position_text)
 st.write(freq_text)
 
 # ------------------------------
-# グラフ描画（色付き改善版、濃く、ラベル太字）
+# グラフ描画（ver1.000のまま、文字化け防止のみ）
 # ------------------------------
 st.subheader("正規分布近似グラフ")
 
@@ -108,15 +113,15 @@ if cum_prob <= 0.5:
 # 当たり回数の縦線（緑）
 ax.axvline(k, color='green', linestyle='--', linewidth=2, label=f"当たり回数={k}")
 
-# ラベル・タイトルを太字
-ax.set_xlabel("当たり回数", fontweight='bold')
-ax.set_ylabel("確率", fontweight='bold')
-ax.set_title("正規分布近似", fontweight='bold')
+# ラベル・タイトルを日本語フォントで
+ax.set_xlabel("当たり回数", fontproperties=jp_font)
+ax.set_ylabel("確率", fontproperties=jp_font)
+ax.set_title("正規分布近似", fontproperties=jp_font)
 
 # 縦横ゼロ固定
 ax.set_ylim(bottom=0)
 ax.set_xlim(left=0)
-ax.legend()
+ax.legend(prop=jp_font)
 ax.grid(True, linestyle='--', alpha=0.5)
 st.pyplot(fig)
 
