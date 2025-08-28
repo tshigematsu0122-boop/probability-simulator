@@ -3,21 +3,17 @@ import math
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import binom, norm
-from matplotlib import font_manager
 
 # ------------------------------
-# Google Noto Sans JP フォント設定
+# matplotlib 日本語対応（Streamlit Cloud向け）
 # ------------------------------
-# Streamlit Cloud でも日本語を表示可能にする
-font_path = "https://github.com/googlefonts/noto-cjk/raw/main/Sans/OTF/Japanese/NotoSansJP-Regular.otf"
-noto_font = font_manager.FontProperties(fname=font_path)
-plt.rcParams["font.family"] = noto_font.get_name()
+plt.rcParams["font.family"] = "DejaVu Sans"
 plt.rcParams["axes.unicode_minus"] = False
 
 # ------------------------------
 # タイトル
 # ------------------------------
-st.title("確率分布シミュレーター ver1.001")
+st.title("確率分布シミュレーター ver1.002")
 
 # ------------------------------
 # 入力欄
